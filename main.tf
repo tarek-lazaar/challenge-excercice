@@ -15,6 +15,47 @@ module "vpc" {
 
 }
 
+#EC2 instance security group
+resource "aws_security_group" "my-sg" {
+  vpc_id = module.vpc.vpc_id
+
+  ingress{
+      from_port   = 0
+      to_port     = 0
+      protocol    = "ALL ICMP - IPv4"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "SSH"
+    cidr_blocks = ["0.0.0.0/0"]
+
+    }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "MY-SG"
+  }
+}
+
+resource "aws_instance" "my-instance" {
+  ami             = "ami-0ec23856b3bad62d3" #RHEL7
+  subnet_id       = module.vpc.private_subnets[0]
+  instance_type   = "t3.micro"
+  key_name        = "key-challenge"
+  security_groups = [aws_security_group.my-sg.id]
+  tags            = { Name = "Library web server" }
+
+  user_data = file("./install.sh")
+}
+
+
 
 
 
