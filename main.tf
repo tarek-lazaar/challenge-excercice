@@ -50,11 +50,20 @@ resource "aws_instance" "my-instance" {
   instance_type   = "t3.micro"
   key_name        = "key-challenge"
   security_groups = [aws_security_group.my-sg.id]
-  tags            = { Name = "Library web server" }
+  tags            = { Name = "Tarek server" }
 
-  user_data = file("./install.sh")
+
 }
+resource "aws_instance" "shared-instance" {
+  ami             = "ami-0ec23856b3bad62d3" #RHEL7
+  subnet_id       = module.vpc.private_subnets[0]
+  instance_type   = "t3.micro"
+  key_name        = "key-challenge"
+  security_groups = [aws_security_group.my-sg.id]
+  tags            = { Name = "Shared server" }
 
+
+}
 
 
 
